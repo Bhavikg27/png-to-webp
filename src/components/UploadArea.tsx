@@ -21,6 +21,7 @@ export const UploadArea: React.FC<UploadAreaProps> = ({ onFilesAdded, className 
         accept: {
             'image/png': ['.png'],
             'image/jpeg': ['.jpg', '.jpeg'],
+            'image/svg+xml': ['.svg'],
         },
         multiple: true
     });
@@ -45,7 +46,7 @@ export const UploadArea: React.FC<UploadAreaProps> = ({ onFilesAdded, className 
                 {isDragActive ? "Drop images here" : "Click or drag images to upload"}
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-                Supports PNG, JPG, and JPEG files.
+                Supports PNG, JPG, JPEG, and SVG files.
             </p>
         </div>
     );
