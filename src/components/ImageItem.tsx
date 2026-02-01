@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download, X, Check, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, X, Check, AlertCircle, Pencil } from 'lucide-react';
 
 export interface ImageItemState {
     id: string;
@@ -7,15 +7,41 @@ export interface ImageItemState {
     status: 'pending' | 'converting' | 'done' | 'error';
     convertedBlob?: Blob;
     originalPreview: string;
+    outputName: string;
 }
 
 interface ImageItemProps {
     item: ImageItemState;
     onRemove: (id: string) => void;
     onDownload: (item: ImageItemState) => void;
+    onRename: (id: string, newName: string) => void;
 }
 
-export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload }) => {
+export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload, onRename }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState(item.outputName);
+
+    useEffect(() => {
+        setEditName(item.outputName);
+    }, [item.outputName]);
+
+    const handleSaveRename = () => {
+        if (editName.trim()) {
+            onRename(item.id, editName.trim());
+        } else {
+            setEditName(item.outputName); // Revert if empty
+        }
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSaveRename();
+        } else if (e.key === 'Escape') {
+            setEditName(item.outputName);
+            setIsEditing(false);
+        }
+    };
 
     const formatSize = (bytes: number) => {
         if (bytes === 0) return '0 B';
@@ -35,7 +61,7 @@ export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload
                     <span className="text-slate-500 line-through">{formatSize(original)}</span>
                     <span className="text-emerald-600 font-bold">{formatSize(converted)}</span>
                     <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px]">
-                        -{saving.toFixed(1)}%
+                        {saving > 0 ? '-' : ''}{Math.abs(saving).toFixed(1)}%
                     </span>
                 </div>
             );
@@ -62,9 +88,31 @@ export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate pr-6" title={item.file.name}>
-                    {item.file.name}
-                </h4>
+                <div className="flex items-center gap-2">
+                    {isEditing ? (
+                        <div className="flex items-center gap-1 w-full max-w-[200px]">
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                onBlur={handleSaveRename}
+                                onKeyDown={handleKeyDown}
+                                autoFocus
+                                className="w-full text-sm px-2 py-1 border border-blue-500 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none"
+                            />
+                        </div>
+                    ) : (
+                        <h4
+                            className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate pr-2 cursor-pointer hover:text-blue-600 flex items-center gap-1"
+                            title="Click to rename"
+                            onClick={() => setIsEditing(true)}
+                        >
+                            {item.outputName}
+                            <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-50" />
+                        </h4>
+                    )}
+                </div>
+
                 {getStats()}
 
                 {/* Status Indicator inside metadata for mobile compactness */}

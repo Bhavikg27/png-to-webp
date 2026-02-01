@@ -12,12 +12,18 @@ function App() {
   const [isConverting, setIsConverting] = useState(false);
 
   const handleFilesAdded = (files: File[]) => {
-    const newItems: ImageItemState[] = files.map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
-      file,
-      status: 'pending',
-      originalPreview: URL.createObjectURL(file)
-    }));
+    const newItems: ImageItemState[] = files.map(file => {
+      const nameParts = file.name.split('.');
+      const nameWithoutExt = nameParts.slice(0, -1).join('.');
+
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        status: 'pending',
+        originalPreview: URL.createObjectURL(file),
+        outputName: nameWithoutExt // Default to original filename (no extension)
+      };
+    });
     setItems(prev => [...prev, ...newItems]);
   };
 
@@ -25,9 +31,15 @@ function App() {
     setItems(prev => {
       const item = prev.find(i => i.id === id);
       if (item?.originalPreview) URL.revokeObjectURL(item.originalPreview);
-      if (item?.convertedBlob) URL.revokeObjectURL(URL.createObjectURL(item.convertedBlob)); // Cleanup roughly
+      if (item?.convertedBlob) URL.revokeObjectURL(URL.createObjectURL(item.convertedBlob));
       return prev.filter(i => i.id !== id);
     });
+  };
+
+  const handleRename = (id: string, newName: string) => {
+    setItems(prev => prev.map(item =>
+      item.id === id ? { ...item, outputName: newName } : item
+    ));
   };
 
   const handleClear = () => {
@@ -40,12 +52,8 @@ function App() {
   const handleConvert = async () => {
     setIsConverting(true);
 
-    // Process sequentially or parallel? Parallel is faster but might freeze UI if too many.
-    // Let's do parallel but update state individually.
-
     const convertItem = async (item: ImageItemState) => {
-      if (item.status === 'done') return item; // Skip already done? Or re-convert if quality changed?
-      // Always re-convert if requested
+      if (item.status === 'done' && item.convertedBlob) return item;
 
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, status: 'converting' } : i));
 
@@ -67,7 +75,13 @@ function App() {
       const url = URL.createObjectURL(item.convertedBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `converted-${item.file.name.split('.')[0]}.webp`;
+      // Append .webp if user didn't type it
+      let filename = item.outputName;
+      if (!filename.toLowerCase().endsWith('.webp')) {
+        filename += '.webp';
+      }
+
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -79,10 +93,16 @@ function App() {
     const convertedItems = items.filter(i => i.status === 'done' && i.convertedBlob);
     if (convertedItems.length === 0) return;
 
-    const imagesToZip = convertedItems.map(item => ({
-      name: `converted-${item.file.name.split('.')[0]}.webp`,
-      blob: item.convertedBlob!
-    }));
+    const imagesToZip = convertedItems.map(item => {
+      let filename = item.outputName;
+      if (!filename.toLowerCase().endsWith('.webp')) {
+        filename += '.webp';
+      }
+      return {
+        name: filename,
+        blob: item.convertedBlob!
+      };
+    });
 
     await downloadZip(imagesToZip, 'converted-images.zip');
   };
@@ -130,6 +150,7 @@ function App() {
                     item={item}
                     onRemove={handleRemove}
                     onDownload={handleDownload}
+                    onRename={handleRename}
                   />
                 ))}
               </div>
