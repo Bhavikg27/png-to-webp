@@ -53,8 +53,6 @@ function App() {
     setIsConverting(true);
 
     const convertItem = async (item: ImageItemState) => {
-      if (item.status === 'done' && item.convertedBlob) return item;
-
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, status: 'converting' } : i));
 
       try {
@@ -68,6 +66,24 @@ function App() {
 
     await Promise.all(items.map(convertItem));
     setIsConverting(false);
+  };
+
+  const handleConvertSingle = async (id: string) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+
+    setIsConverting(true);
+    setItems(prev => prev.map(i => i.id === id ? { ...i, status: 'converting' } : i));
+
+    try {
+      const blob = await convertImageToWebP(item.file, quality);
+      setItems(prev => prev.map(i => i.id === id ? { ...i, status: 'done', convertedBlob: blob } : i));
+    } catch (error) {
+      console.error(error);
+      setItems(prev => prev.map(i => i.id === id ? { ...i, status: 'error' } : i));
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   const handleDownload = (item: ImageItemState) => {
@@ -151,6 +167,7 @@ function App() {
                     onRemove={handleRemove}
                     onDownload={handleDownload}
                     onRename={handleRename}
+                    onConvertSingle={handleConvertSingle}
                   />
                 ))}
               </div>
