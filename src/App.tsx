@@ -5,6 +5,7 @@ import { ImageItem, type ImageItemState } from './components/ImageItem'
 import { convertImageToWebP } from './services/imageConverter'
 import { downloadZip } from './services/zipGenerator'
 import { Image as ImageIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
   const [items, setItems] = useState<ImageItemState[]>([]);
@@ -126,28 +127,49 @@ function App() {
   const hasConverted = items.some(i => i.status === 'done');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 md:p-8 font-sans text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 p-4 md:p-8 font-sans text-slate-100 transition-colors">
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
-        <header className="mb-10 text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
-            <ImageIcon className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 mb-3">
+        <header className="mb-12 mt-4 text-center">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center justify-center p-3.5 bg-blue-600/10 border border-blue-500/20 rounded-2xl mb-6 shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]"
+          >
+            <ImageIcon className="w-8 h-8 text-blue-400" />
+          </motion.div>
+          <motion.h1
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white to-slate-400 mb-4"
+          >
             Image to WebP Converter
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">
-            Convert your images to WebP format instantly in your browser.
-          </p>
+          </motion.h1>
+          <motion.p
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-slate-400 text-lg md:text-xl font-medium max-w-2xl mx-auto"
+          >
+            Convert PNG and JPG images to optimized WebP format instantly in your browser. Fast and secure.
+          </motion.p>
         </header>
 
         {/* Main Content */}
         <main>
           {items.length === 0 ? (
-            <UploadArea onFilesAdded={handleFilesAdded} className="min-h-[300px]" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <UploadArea onFilesAdded={handleFilesAdded} className="min-h-[300px]" />
+            </motion.div>
           ) : (
-            <>
+            <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <ControlPanel
                 quality={quality}
                 setQuality={setQuality}
@@ -159,29 +181,34 @@ function App() {
                 hasFiles={items.length > 0}
               />
 
-              <div className="flex flex-col gap-3">
-                {items.map(item => (
-                  <ImageItem
-                    key={item.id}
-                    item={item}
-                    onRemove={handleRemove}
-                    onDownload={handleDownload}
-                    onRename={handleRename}
-                    onConvertSingle={handleConvertSingle}
-                  />
-                ))}
-              </div>
+              <motion.div layout className="flex flex-col gap-3">
+                <AnimatePresence>
+                  {items.map(item => (
+                    <ImageItem
+                      key={item.id}
+                      item={item}
+                      onRemove={handleRemove}
+                      onDownload={handleDownload}
+                      onRename={handleRename}
+                      onConvertSingle={handleConvertSingle}
+                    />
+                  ))}
+                </AnimatePresence>
+              </motion.div>
 
-              <div className="mt-8">
+              <motion.div layout className="mt-8">
                 <UploadArea onFilesAdded={handleFilesAdded} className="py-8 border-dashed border-2 opacity-70 hover:opacity-100" />
-              </div>
-            </>
+              </motion.div>
+            </motion.div>
           )}
         </main>
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-slate-400 text-sm">
+        <footer className="mt-20 pb-8 text-center text-slate-500 text-sm space-y-2">
           <p>Privacy friendly &bull; No files uploaded to server &bull; Runs offline</p>
+          <p>
+            Created by <a href="https://github.com/Bhavikg27" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Bhavikg27</a> &bull; <a href="https://github.com/Bhavikg27/png-to-webp" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">View on GitHub</a>
+          </p>
         </footer>
 
       </div>
