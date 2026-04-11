@@ -154,7 +154,7 @@ function App() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-slate-400 text-lg md:text-xl font-medium max-w-2xl mx-auto"
           >
-            Convert PNG and JPG images to optimized WebP format instantly in your browser. Fast, secure, and offline.
+            Convert PNG and JPG images to optimized WebP format instantly in your browser. Fast and secure.
           </motion.p>
         </header>
 
@@ -204,8 +204,11 @@ function App() {
         </main>
 
         {/* Footer */}
-        <footer className="mt-20 pb-8 text-center text-slate-500 text-sm">
+        <footer className="mt-20 pb-8 text-center text-slate-500 text-sm space-y-2">
           <p>Privacy friendly &bull; No files uploaded to server &bull; Runs offline</p>
+          <p>
+            Created by <a href="https://github.com/Bhavikg27" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Bhavikg27</a> &bull; <a href="https://github.com/Bhavikg27/png-to-webp" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">View on GitHub</a>
+          </p>
         </footer>
 
       </div>
