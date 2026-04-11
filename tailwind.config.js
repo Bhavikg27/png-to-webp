@@ -9,6 +9,10 @@ export default {
             fontFamily: {
                 sans: ['Inter', 'system-ui', 'sans-serif'],
             },
+            colors: {
+                primary: '#3b82f6',
+                success: '#10b981'
+            }
         },
     },
     plugins: [],

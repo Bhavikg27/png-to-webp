@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { UploadCloud } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion } from 'framer-motion';
 
 interface UploadAreaProps {
     onFilesAdded: (files: File[]) => void;
@@ -27,27 +28,33 @@ export const UploadArea: React.FC<UploadAreaProps> = ({ onFilesAdded, className 
     });
 
     return (
-        <div
-            {...getRootProps()}
-            className={twMerge(
+        <div {...getRootProps()}>
+            <motion.div
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className={twMerge(
                 clsx(
-                    "border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ease-in-out",
-                    "hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10",
-                    isDragActive ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]" : "border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50"
+                    "border-2 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300",
+                    "hover:border-blue-500 hover:bg-blue-900/20 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]",
+                    isDragActive
+                        ? "border-blue-500 bg-blue-900/30 scale-[1.02] shadow-[0_0_40px_-10px_rgba(59,130,246,0.4)]"
+                        : "border-slate-700 bg-slate-900/50"
                 ),
                 className
             )}
         >
             <input {...getInputProps()} />
-            <div className="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-full mb-4">
-                <UploadCloud className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <div className="bg-blue-600/10 p-4 rounded-full mb-5 border border-blue-500/20 shadow-inner">
+                <UploadCloud className="w-10 h-10 text-blue-400" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                {isDragActive ? "Drop images here" : "Click or drag images to upload"}
+            <h3 className="text-xl font-bold text-slate-100 mb-2">
+                {isDragActive ? "Drop images here..." : "Click or drag images to upload"}
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-                Supports PNG, JPG, JPEG, and SVG files.
-            </p>
+                <p className="text-slate-400 max-w-sm">
+                    Supports PNG, JPG, and JPEG files.
+                </p>
+            </motion.div>
         </div>
     );
 };
