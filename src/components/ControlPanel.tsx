@@ -68,6 +68,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                                 <RefreshCw className="w-4 h-4 animate-spin" />
                                 Converting...
                             </>
+                        ) : hasConverted ? (
+                            'Re-convert All'
                         ) : (
                             'Convert Images'
                         )}

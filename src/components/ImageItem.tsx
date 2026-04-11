@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Check, AlertCircle, Pencil } from 'lucide-react';
+import { Download, X, Check, AlertCircle, Pencil, RefreshCw } from 'lucide-react';
 
 export interface ImageItemState {
     id: string;
@@ -15,9 +15,10 @@ interface ImageItemProps {
     onRemove: (id: string) => void;
     onDownload: (item: ImageItemState) => void;
     onRename: (id: string, newName: string) => void;
+    onConvertSingle?: (id: string) => void;
 }
 
-export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload, onRename }) => {
+export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload, onRename, onConvertSingle }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState(item.outputName);
 
@@ -132,6 +133,15 @@ export const ImageItem: React.FC<ImageItemProps> = ({ item, onRemove, onDownload
                 >
                     <X className="w-4 h-4" />
                 </button>
+                {item.status === 'done' && onConvertSingle && (
+                    <button
+                        onClick={() => onConvertSingle(item.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors"
+                        title="Re-convert"
+                    >
+                        <RefreshCw className="w-4 h-4" />
+                    </button>
+                )}
                 {item.status === 'done' && (
                     <button
                         onClick={() => onDownload(item)}
