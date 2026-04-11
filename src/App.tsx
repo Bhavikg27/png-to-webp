@@ -31,7 +31,6 @@ function App() {
     setItems(prev => {
       const item = prev.find(i => i.id === id);
       if (item?.originalPreview) URL.revokeObjectURL(item.originalPreview);
-      if (item?.convertedBlob) URL.revokeObjectURL(URL.createObjectURL(item.convertedBlob));
       return prev.filter(i => i.id !== id);
     });
   };
